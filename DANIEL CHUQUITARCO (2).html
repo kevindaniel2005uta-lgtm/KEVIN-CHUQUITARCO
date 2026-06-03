@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resolución Hidráulica Dinámica - UTA</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.5;
+            color: #333;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        /* Encabezado Institucional */
+        .header-box {
+            border: 2px solid #1a365d;
+            border-radius: 6px;
+            padding: 24px;
+            background-color: #f0f4f8;
+            margin-bottom: 25px;
+        }
+        .header-box h1 {
+            color: #1a365d;
+            margin-top: 0;
+            text-align: center;
+            font-size: 26px;
+            border-bottom: 2px solid #1a365d;
+            padding-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            font-size: 16px;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .info-item strong {
+            color: #2c3d52;
+            white-space: nowrap;
+        }
+        
+        /* Bloque de Control de Variables del Canal */
+        .control-panel {
+            background-color: #f0fdf4;
+            border: 2px solid #bbf7d0;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+        }
+        .control-panel h3 {
+            margin-top: 0;
+            color: #166534;
+            font-size: 18px;
+            border-bottom: 1px solid #bbf7d0;
+            padding-bottom: 5px;
+        }
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        /* Inputs estilizados */
+        input[type="text"], input[type="number"] {
+            font-family: inherit;
+            font-size: 15px;
+            padding: 6px 10px;
+            border: 1px solid #cbd5e1;
+            background-color: #fff;
+            border-radius: 4px;
+            color: #1e293b;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        input[type="number"]:focus {
+            border-color: #16a34a;
+            background-color: #f0fdf4;
+            outline: none;
+        }
+        .control-panel label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #374151;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Contenedor Gráfico (Conserva la misma imagen) */
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        /* Estructura de Desglose Matemático */
+        .section-title-bar {
+            border-left: 5px solid #0284c7;
+            padding-left: 12px;
+            color: #0369a1;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            margin-top: 40px;
+        }
+        .step-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #64748b;
+            padding: 18px;
+            margin-bottom: 16px;
+            border-radius: 0 6px 6px 0;
+        }
+        .step-card-title {
+            font-weight: bold;
+            color: #334155;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .math-block {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 15px;
+            color: #1e293b;
+            background: #f1f5f9;
+            padding: 14px;
+            border-radius: 4px;
+            display: block;
+            line-height: 1.8;
+        }
+        .val-red {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        /* Banners de Resultados Totales */
+        .total-banner-area {
+            background-color: #e0f2fe;
+            border-left: 6px solid #0284c7;
+            color: #0c4a6e;
+            padding: 18px;
+            font-size: 22px;
+            font-weight: bold;
+            margin: 30px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .total-banner-perimetro {
+            background-color: #ffedd5;
+            border-left: 6px solid #ea580c;
+            color: #7c2d12;
+            padding: 18px;
+            font-size: 22px;
+            font-weight: bold;
+            margin: 30px 0;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="header-box">
+        <h1>UNIVERSIDAD TÉCNICA DE AMBATO</h1>
+        <div class="info-grid">
+            <div class="info-item"><strong>DOCENTE:</strong> <input type="text" value="FABIAN MORALES"></div>
+            <div class="info-item"><strong>ESTUDIANTE:</strong> <input type="text" value="CHUQUITARCO KEVIN"></div>
+            <div class="info-item"><strong>CURSO:</strong> <input type="text" value="PRIMERO B"></div>
+            <div class="info-item"><strong>ASIGNATURA:</strong> <input type="text" value="HIDRÁULICA / TIC'S"></div>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <h3>⚙️ Datos Geométricos del Canal (Edita aquí para recalcular todo)</h3>
+        <div class="control-grid">
+            <div>
+                <label>Ancho Talud Izq. (m):</label>
+                <input type="number" step="0.01" id="ctrl_b_izq" value="0.88" oninput="recalcularFormulas()">
+            </div>
+            <div>
+                <label>Altura Tirante h (m):</label>
+                <input type="number" step="0.01" id="ctrl_h" value="1.10" oninput="recalcularFormulas()">
+            </div>
+            <div>
+                <label>Base Solera Central (m):</label>
+                <input type="number" step="0.01" id="ctrl_base_c" value="1.20" oninput="recalcularFormulas()">
+            </div>
+            <div>
+                <label>Radio Curvatura r (m):</label>
+                <input type="number" step="0.01" id="ctrl_r" value="0.75" oninput="recalcularFormulas()">
+            </div>
+        </div>
+    </div>
+
+    <div class="canvas-container">
+        <svg width="500" height="360" viewBox="0 0 500 360" style="background:#fff;">
+            <path d="M 20 40 L 90 140 L 400 140 A 110 110 0 0 0 470 40 Z" fill="#dbeafe" stroke="#1d4ed8" stroke-width="4"/>
+            <line x1="20" y1="40" x2="400" y2="40" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 4"/>
+            <text x="35" y="105" font-size="13" font-family="sans-serif" fill="#334155">l1 = <tspan id="txt_l1_svg">1.41</tspan>m</text>
+            <text x="230" y="158" font-size="14" font-family="sans-serif" font-weight="bold" fill="#334155"><tspan id="txt_base_svg">1.20</tspan>m</text>
+            <text x="445" y="100" font-size="13" font-family="sans-serif" fill="#334155">l2 = <tspan id="txt_l2_svg">1.54</tspan>m</text>
+
+            <line x1="20" y1="200" x2="90" y2="300" stroke="#000000" stroke-width="3"/>
+            <line x1="90" y1="300" x2="400" y2="300" stroke="#000000" stroke-width="3"/>
+            <path d="M 400 300 A 110 110 0 0 0 470 200" fill="none" stroke="#000000" stroke-width="3"/>
+            
+            <line x1="90" y1="200" x2="90" y2="300" stroke="#dc2626" stroke-width="2" stroke-dasharray="4 4"/>
+            <line x1="400" y1="200" x2="400" y2="300" stroke="#0284c7" stroke-width="2" stroke-dasharray="4 4"/>
+            <line x1="400" y1="248" x2="470" y2="248" stroke="#7c3aed" stroke-width="2" stroke-dasharray="4 4"/>
+            <line x1="400" y1="248" x2="453" y2="295" stroke="#16a34a" stroke-width="2" stroke-dasharray="4 4"/>
+
+            <text x="52" y="260" font-size="15" font-family="sans-serif" font-weight="bold" fill="#b91c1c">A1</text>
+            <text x="235" y="245" font-size="16" font-family="sans-serif" font-weight="bold" fill="#1d4ed8">A2</text>
+            <text x="415" y="185" font-size="15" font-family="sans-serif" font-weight="bold" fill="#16a34a">A3</text>
+            <text x="448" y="215" font-size="15" font-family="sans-serif" font-weight="bold" fill="#ea580c">A4</text>
+            <text x="425" y="265" font-size="15" font-family="sans-serif" font-weight="bold" fill="#9333ea">A5</text>
+        </svg>
+    </div>
+
+    <div class="section-title-bar">1. Desglose del Cálculo del Área</div>
+
+    <div class="step-card">
+        <div class="step-card-title">Área 1 (Triángulo Izq.):</div>
+        <div class="math-block" id="calc_a1"></div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-card-title">Área 2 (Rectángulo Central):</div>
+        <div class="math-block" id="calc_a2"></div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-card-title">Área 4 (Triángulo Auxiliar):</div>
+        <div class="math-block" id="calc_a4"></div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-card-title">Área 3 (Sector Circular):</div>
+        <div class="math-block" id="calc_a3"></div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-card-title">Área 5 (Cuadrante Base Círculo):</div>
+        <div class="math-block" id="calc_a5"></div>
+    </div>
+
+    <div class="total-banner-area" id="calc_at"></div>
+
+
+    <div class="section-title-bar">2. Desglose del Perímetro Mojado</div>
+
+    <div class="step-card">
+        <div class="step-card-title">Lado l1 (Inclinado Izquierdo):</div>
+        <div class="math-block" id="calc_l1"></div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-card-title">Base Recta Inferior:</div>
+        <div class="math-block" id="calc_base"></div>
+    </div>
+
+    <div class="step-card">
+        <div class="step-card-title">Lado l2 (Arco Derecho de Pared):</div>
+        <div class="math-block" id="calc_l2"></div>
+    </div>
+
+    <div class="total-banner-perimetro" id="calc_pm"></div>
+
+</div>
+
+<script>
+    function recalcularFormulas() {
+        // 1. Capturar los datos de entrada del panel de control
+        const b_izq = parseFloat(document.getElementById('ctrl_b_izq').value) || 0;
+        const h_total = parseFloat(document.getElementById('ctrl_h').value) || 0;
+        const base_c = parseFloat(document.getElementById('ctrl_base_c').value) || 0;
+        const r = parseFloat(document.getElementById('ctrl_r').value) || 0;
+        const diametro = r * 2;
+
+        // ---- OPERACIONES MATEMÁTICAS REALES ----
+        
+        // Área 1
+        const a1 = (b_izq * h_total) / 2;
+
+        // Área 2
+        const a2 = base_c * h_total;
+
+        // Área 4
+        const h_aux = r - (diametro - h_total); // Ajuste dinámico de geometría h = r - (D - h)
+        // Controlar si la raíz da un número negativo
+        const dentro_raiz = Math.pow(r, 2) - Math.pow(h_aux, 2);
+        const b_aux = dentro_raiz > 0 ? Math.sqrt(dentro_raiz) : 0;
+        const a4 = (b_aux * h_aux) / 2;
+
+        // Área 3 (Ángulos)
+        let alpha_deg = 0;
+        if (r > 0 && h_aux <= r && h_aux >= -r) {
+            alpha_deg = Math.acos(h_aux / r) * (180 / Math.PI);
+        }
+        const theta_deg = 90.0 - alpha_deg;
+        const theta_rad = theta_deg * (Math.PI / 180);
+        const a3 = 0.5 * Math.pow(r, 2) * theta_rad;
+
+        // Área 5
+        const a5 = (Math.PI * Math.pow(r, 2)) / 4;
+
+        // Área Total
+        const AT = a1 + a2 + a3 + a4 + a5;
+
+        // Perímetros
+        const l1 = Math.sqrt(Math.pow(b_izq, 2) + Math.pow(h_total, 2));
+        const angulo_arco = 90.0 + theta_deg;
+        const l2 = (Math.PI * diametro * angulo_arco) / 360.0;
+        const PM = l1 + base_c + l2;
+
+        // ---- INYECTAR TEXTO Y FÓRMULAS DINÁMICAMENTE ----
+        
+        // Actualizar textos en la imagen SVG
+        document.getElementById('txt_l1_svg').innerText = l1.toFixed(2);
+        document.getElementById('txt_base_svg').innerText = base_c.toFixed(2);
+        document.getElementById('txt_l2_svg').innerText = l2.toFixed(2);
+
+        // Desglose de Áreas
+        document.getElementById('calc_a1').innerHTML = `
+            b = ${h_total.toFixed(2)} * ${(b_izq/h_total).toFixed(2)} = ${b_izq.toFixed(3)} m<br>
+            A1 = (${b_izq.toFixed(3)} * ${h_total.toFixed(2)}) / 2 = <span class="val-red">${a1.toFixed(3)} m²</span>
+        `;
+
+        document.getElementById('calc_a2').innerHTML = `
+            A2 = ${base_c.toFixed(2)} * ${h_total.toFixed(2)} = <span class="val-red">${a2.toFixed(3)} m²</span>
+        `;
+
+        document.getElementById('calc_a4').innerHTML = `
+            h = ${r.toFixed(2)} - (${diametro.toFixed(2)} - ${h_total.toFixed(2)}) = ${h_aux.toFixed(2)} m<br>
+            b = √(${r.toFixed(2)}² - ${h_aux.toFixed(2)}²) = ${b_aux.toFixed(3)} m<br>
+            A4 = (${b_aux.toFixed(3)} * ${h_aux.toFixed(2)}) / 2 = <span class="val-red">${a4.toFixed(3)} m²</span>
+        `;
+
+        document.getElementById('calc_a3').innerHTML = `
+            α = acos(${h_aux.toFixed(2)} / ${r.toFixed(2)}) = ${alpha_deg.toFixed(3)}°<br>
+            θ = 90° - α = ${theta_deg.toFixed(3)}° (${theta_rad.toFixed(3)} rad)<br>
+            A3 = 0.5 * ${r.toFixed(2)}² * ${theta_rad.toFixed(3)} = <span class="val-red">${a3.toFixed(3)} m²</span>
+        `;
+
+        document.getElementById('calc_a5').innerHTML = `
+            A5 = (π * ${r.toFixed(2)}²) / 4 = <span class="val-red">${a5.toFixed(3)} m²</span>
+        `;
+
+        document.getElementById('calc_at').innerHTML = `
+            ÁREA TOTAL (AT) = ${AT.toFixed(3)} m²
+        `;
+
+        // Desglose de Perímetro
+        document.getElementById('calc_l1').innerHTML = `
+            l1 = √(${b_izq.toFixed(3)}² + ${h_total.toFixed(2)}²) = <span class="val-red">${l1.toFixed(3)} m</span>
+        `;
+
+        document.getElementById('calc_base').innerHTML = `
+            Base = <span class="val-red">${base_c.toFixed(2)} m</span>
+        `;
+
+        document.getElementById('calc_l2').innerHTML = `
+            Ángulo de arco = 90° + ${theta_deg.toFixed(3)}° = ${angulo_arco.toFixed(3)}°<br>
+            l2 = (π * ${diametro.toFixed(2)} * ${angulo_arco.toFixed(3)}°) / 360° = <span class="val-red">${l2.toFixed(3)} m</span>
+        `;
+
+        document.getElementById('calc_pm').innerHTML = `
+            PERÍMETRO MOJADO TOTAL = ${PM.toFixed(3)} m
+        `;
+    }
+
+    // Ejecutar al cargar la página por primera vez
+    window.onload = recalcularFormulas;
+</script>
+
+</body>
+</html>
